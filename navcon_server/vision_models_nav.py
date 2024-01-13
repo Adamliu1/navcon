@@ -1055,13 +1055,17 @@ class BLIPModel(BaseModel):
         with warnings.catch_warnings(), HiddenPrints("BLIP"), torch.cuda.device(self.dev):
             max_memory = {gpu_number: torch.cuda.mem_get_info(self.dev)[0]}
 
-            self.processor = Blip2Processor.from_pretrained(f"Salesforce/{blip_v2_model_type}")
+            # self.processor = Blip2Processor.from_pretrained(f"Salesforce/{blip_v2_model_type}")
+            # NOTE: I modiftied here so It offloads weights to disk
+            offload_folder = "/media/adamliu/2TB_SSD/my_model_offload_location"
+            self.processor = BlipProcessor.from_pretrained(f"Salesforce/{blip_v2_model_type}")
             # Device_map must be sequential for manual GPU selection
             try:
                 self.model = Blip2ForConditionalGeneration.from_pretrained(
                     f"Salesforce/{blip_v2_model_type}", load_in_8bit=half_precision,
                     torch_dtype=torch.float16 if half_precision else "auto",
-                    device_map="sequential", max_memory=max_memory
+                    device_map="sequential", max_memory=max_memory,
+                    offload_folder=offload_folder
                 )
             except Exception as e:
                 # Clarify error message. The problem is that it tries to load part of the model to disk.

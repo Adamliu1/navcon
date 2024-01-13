@@ -4,7 +4,8 @@ from omegaconf import OmegaConf
 # The default
 config_names = os.getenv('CONFIG_NAMES', None)
 if config_names is None:
-    config_names = 'navcon_single'  # Modify this if you want to use another default config
+    # config_names = 'navcon_single'  # Modify this if you want to use another default config
+    config_names = 'adam_FYP_single_cam'  # Modify this if you want to use another default config
 
 configs = [OmegaConf.load('configs/base_config.yaml')]
 
